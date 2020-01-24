@@ -105,6 +105,7 @@ def parking_table_view():
     print('4.Vehicle No.')
     print('5.Date of Parking')
     print('6.All')
+    print("Press any other key to go back to main menu \n")
     ch= int(input('enter the choice:' ))
     if ch==1:
         s=int(input('enter parking no: '))
@@ -134,12 +135,18 @@ def parking_table_view():
     elif ch==6:
         sql='select * from parkmaster11'
         mycursor.execute(sql)
+    else:
+        return
 
     res=mycursor.fetchall()
-    print('DETAILS about parking are as follows:')
-    print('Parking ID,Parking Name,Level,FreeSpace(Y/N),Vehicle No.,No. of days for parking,Payment')
-    for x in res:
-        print(repr(x))
+    if(len(res)>0):
+        print('DETAILS about parking are as follows:')
+        print('Parking ID,Parking Name,Level,FreeSpace(Y/N),Vehicle No.,No. of days for parking,Payment')
+        for x in res:
+            print(repr(x))
+    else:
+        print("No data found. Please try again. \n")
+        parking_table_view()
 
 def checkout():
     vid=int(input('enter vid from receipt: '))
@@ -147,8 +154,9 @@ def checkout():
     sql='select * from parkmaster11 where vid=?'
     mycursor.execute(sql,s)  
     res=mycursor.fetchone()
-    li_pkdt=res[10].split("/")
-    datepark=date(int(li_pkdt[2]),int(li_pkdt[1]),int(li_pkdt[0]))
+    li_pkdt=res[10].split("-")
+    print(int(li_pkdt[2]),int(li_pkdt[1]),int(li_pkdt[0]))
+    datepark=date(int(li_pkdt[0]),int(li_pkdt[1]),int(li_pkdt[2]))
     li_dt=input('enter in format dd-mm-yyyy').split("-")
     dateofpick=date(int(li_dt[2]),int(li_dt[1]),int(li_dt[0]))
     diff=dateofpick-datepark
@@ -166,8 +174,12 @@ def checkout():
         perdaycharge=350
     elif vehtype=='truck':
         perdaycharge=300
-    penalty=diff*perdaycharge
-    #penalty=0
+    
+    if(diff>int(res[6])):
+        diff=diff-int(res[6])
+        penalty=diff*perdaycharge
+    else:
+        penalty=0
     payment=res[9]
     total_payment=penalty+payment
     print('-----------------------------------------------------------------------------------------------')
@@ -201,19 +213,19 @@ def remove():
     if ch==1:
         vid=int(input('enter the Parking No. of the vehicle which was alloted to the person: '))
         rl=(vid,)
-        sql='delete from vehicle where vid=?'
+        sql='delete from parkmaster11 where vid=?'
         mycursor.execute(sql,rl)
         mydb.commit()
     elif ch==2:
         pname=input('enter the person Name : ')
         rl=(pname,)
-        sql='delete from vehicle where pname=?'
+        sql='delete from parkmaster11 where pname=?'
         mycursor.execute(sql,rl)
         mydb.commit()
     elif ch==3:
         vehicleno1=int(input('enter the vehicle no. of the vehicle whose details is to be viewed: '))
         rl=(vehicleno1,)
-        sql='delete from vehicle where vehicleno1=?'
+        sql='delete from parkmaster11 where vehicleno1=?'
         mycursor.execute(sql,rl)
         mydb.commit()
 
