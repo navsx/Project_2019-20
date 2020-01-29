@@ -203,10 +203,6 @@ class hotelfarecal:
 
             
 
-        
-
-        
-
 def main():
 
     a=hotelfarecal()
